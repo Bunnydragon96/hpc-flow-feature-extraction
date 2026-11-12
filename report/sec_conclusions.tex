@@ -1,0 +1,23 @@
+\section{Conclusions}
+We built a packet-to-flow feature extraction pipeline with a sequential
+baseline, two OpenMP strategies, a CUDA pipeline with three reduction kernels
+and an MPI4Py driver, and verified that all of them produce identical flow
+records. On synthetic traffic the GPU version is up to \sizeChunkSp\x{} faster
+than the baseline and 8 threads up to \skewPartSpZero\x; on a real backbone
+trace the gains are 4.3\x{} and \realPartSp\x.
+
+The main lesson is that grouping performance depends on the shape of the
+traffic more than on the programming model. Many flows make the problem
+memory-bound; partitioning by flow hash then helps even with one thread. A
+dominant flow breaks every scheme that gives a flow to a single worker
+(a partition, a GPU thread) and makes a shared table slower than one thread;
+schemes that split the packets evenly and combine partial results (the merge
+on the processor, the chunked kernel on the GPU) are robust to it. Real traffic
+shows both problems at once, and its many single-packet flows make the output
+transfer the largest GPU cost. Parallel resources beyond the 4 physical cores
+of the test machine gave no benefit, for threads and for processes alike.
+
+Future work: choose the strategy at run time from a sample of the batch; run
+the MPI driver on several nodes, where memory is not shared; process
+captures larger than GPU memory in pieces using the merge operation; and add
+bidirectional flows and flow timeouts as flow exporters use.

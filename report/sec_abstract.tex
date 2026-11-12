@@ -1,0 +1,16 @@
+\noindent{\fontsize{9}{10.5}\selectfont\bfseries\itshape Abstract---This paper
+describes a parallel pipeline that converts network packets into flow
+records with \nfeat{} statistical features per flow. We implement a sequential
+baseline, two multithreaded strategies, a graphics-processor pipeline built
+from a lock-free hash table, sorting and segmented reductions, and a
+message-passing driver for batches of capture files. Every parallel version
+reproduces the baseline records exactly in \nchecks{} checks. On 33.5
+million synthetic packets, the graphics-processor version is \sizeChunkSp{}
+times faster than the baseline, and eight processor threads are \sizePartSp{}
+times faster. On a real backbone trace the gains are 4.3 and 2.8 times,
+because \realSingle\% of its flows have a single packet and copying the records
+back takes \gpuRealDownShare\% of the time. Skew decides the winner: when one
+flow dominates, a kernel with one thread per flow is \skewFlowSlow{} times slower
+than a chunked kernel, and a shared locked table is slower than one
+thread.\par}
+\vspace{6pt}

@@ -205,15 +205,15 @@ def part_skew(vm):
         r = sel(vm, part="skew", impl="seq", zipf=z)[0]
         tops.append(100.0 * r["top_flow_packets"] / r["n"])
         flows.append(r["nflows"])
-    lines.append("Flows (thousands) & " + " & ".join("%.0f" % (f / 1e3) for f in flows) + " \\\\")
-    lines.append("Largest flow (\\% of packets) & " + " & ".join(("%.3f" % t) if t < 0.01 else ("%.2f" % t if t < 1 else "%.1f" % t) for t in tops) + " \\\\")
+    lines.append("Flows ($10^3$) & " + " & ".join("%.0f" % (f / 1e3) for f in flows) + " \\\\")
+    lines.append("Top flow (\\%) & " + " & ".join("$<$0.01" if t < 0.01 else ("%.2f" % t if t < 1 else "%.1f" % t) for t in tops) + " \\\\")
     lines.append("\\midrule")
     for impl in IMPLS:
         t = [get(vm, "skew", impl, zipf=z) for z in zs]
         best = [min(get(vm, "skew", i, zipf=z) for i in IMPLS) for z in zs]
         cells = [("\\textbf{%s}" % fmt_ms(x)) if x == b else fmt_ms(x) for x, b in zip(t, best)]
         lines.append("%s & %s \\\\" % (tex(impl), " & ".join(cells)))
-    write("skew.tex", lines)
+    write("skew_short.tex", lines)
     for z, tag in ((0.0, "Zero"), (1.0, "One"), (1.5, "Hi"), (2.0, "Two")):
         seq = get(vm, "skew", "seq", zipf=z)
         num("skewSeq" + tag, fmt_ms(seq))
@@ -249,7 +249,7 @@ def part_flows(vm):
 def part_scaling(vm, mac):
     zs = [0.0, 1.0, 1.5]
     ts = [1, 2, 3, 4, 6, 8]
-    fig, axes = ps.subplots(1, 3, figsize=(FULL_W, 2.35))
+    fig, axes = ps.subplots(1, 3, figsize=(FULL_W, 2.75))
     ramp = [ps.RAMP5[0], ps.RAMP5[2], ps.RAMP5[4]]
     marks = ["o", "D", "^"]
     for a, impl in enumerate(["omp-part", "omp-merge"]):
@@ -264,7 +264,7 @@ def part_scaling(vm, mac):
         ax.set_xlabel("threads")
         ax.set_ylabel("speedup over sequential")
         ax.set_ylim(0, None)
-        ax.legend(loc="upper left", handlelength=1.8, borderaxespad=0.2)
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.24), ncol=2, handlelength=1.8, columnspacing=1.0)
     # (c) MPI
     ax = axes[0][2]
     procs = [1, 2, 4, 8]
@@ -285,7 +285,7 @@ def part_scaling(vm, mac):
     ax.set_xlabel("processes")
     ax.set_ylabel("speedup over one process")
     ax.set_ylim(0, None)
-    ax.legend(loc="upper left", handlelength=1.8, borderaxespad=0.2)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.24), ncol=2, handlelength=1.8, columnspacing=1.0)
     fig.tight_layout(w_pad=1.2)
     save(fig, "scaling.pdf")
 
@@ -431,6 +431,12 @@ def part_gpu(vm):
                 lines.append("%s & %s & %s & %s & %.1f & %s & %.1f & %s \\\\" % (
                     lab, "page-locked" if pin else "pageable", "staged" if pout else "direct",
                     fmt_ms(up), mb_in / up / 1e3, fmt_ms(down), mb_out / down / 1e3, fmt_ms(med(rows))))
+                if lab == "real":
+                    tag = ("Pin" if pin else "Page") + ("Staged" if pout else "Direct")
+                    num("xferUp" + tag, "%.1f" % (mb_in / up / 1e3))
+                    num("xferDown" + tag, "%.1f" % (mb_out / down / 1e3))
+                    num("xferDownMs" + tag, fmt_ms(down))
+                    num("xferTotal" + tag, fmt_ms(med(rows)))
                 if lab == "real" and pin == 1 and pout == 0:
                     num("xferRealOutMB", "%.0f" % mb_out)
                     num("xferRealInMB", "%.0f" % mb_in)
@@ -468,6 +474,9 @@ def part_contention(vm):
     ax.set_ylabel("million packets per second")
     ax.legend(loc="upper center", bbox_to_anchor=(0.45, -0.2), ncol=1, handlelength=2.2)
     save(fig, "contention.pdf")
+    num("contSeqHi", "%.0f" % val[("seq", 1.5)])
+    num("contLockHiMpps", "%.0f" % val[("lock", 1.5)])
+    num("contLocalHiMpps", "%.0f" % val[("local", 1.5)])
     num("contLockZero", "%.1f" % (val[("lock", 0.0)] / val[("seq", 0.0)]))
     num("contAtomicZero", "%.1f" % (val[("atomic", 0.0)] / val[("seq", 0.0)]))
     num("contLockHi", "%.0f" % (val[("seq", 1.5)] / val[("lock", 1.5)]))

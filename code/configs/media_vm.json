@@ -2,66 +2,619 @@
   "description": "Full experiment matrix for the Linux machine with the NVIDIA GPU (8 logical CPUs).",
   "reps": 7,
   "warmup": 2,
-  "mpirun": ["mpirun", "--bind-to", "none"],
+  "mpirun": [
+    "mpirun",
+    "--bind-to",
+    "none"
+  ],
   "batch_sets": {
-    "uneven": {"zipf": 1.0, "logn": [24, 24, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21]}
+    "uneven": {
+      "zipf": 1.0,
+      "logn": [
+        24,
+        24,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        21
+      ]
+    }
   },
   "parts": {
     "size": [
-      {"tool": "flowfeat", "grid": {"logn": [20, 21, 22, 23, 24, 25], "impl": ["seq", "gpu-flow", "gpu-atomic", "gpu-chunk"]}, "fixed": {"zipf": 1.0}},
-      {"tool": "flowfeat", "grid": {"logn": [20, 21, 22, 23, 24, 25], "impl": ["omp-part", "omp-merge"]}, "fixed": {"zipf": 1.0, "threads": 8}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "logn": [
+            20,
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "impl": [
+            "seq",
+            "gpu-flow",
+            "gpu-atomic",
+            "gpu-chunk"
+          ]
+        },
+        "fixed": {
+          "zipf": 1.0
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "logn": [
+            20,
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "impl": [
+            "omp-part",
+            "omp-merge"
+          ]
+        },
+        "fixed": {
+          "zipf": 1.0,
+          "threads": 8
+        }
+      }
     ],
     "threads": [
-      {"tool": "flowfeat", "grid": {"zipf": [0.0, 1.0, 1.5], "impl": ["seq"]}, "fixed": {"logn": 24, "flows": 1048576}},
-      {"tool": "flowfeat", "grid": {"zipf": [0.0, 1.0, 1.5], "impl": ["omp-part", "omp-merge"], "threads": [1, 2, 3, 4, 6, 8]}, "fixed": {"logn": 24, "flows": 1048576}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "zipf": [
+            0.0,
+            1.0,
+            1.5
+          ],
+          "impl": [
+            "seq"
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "zipf": [
+            0.0,
+            1.0,
+            1.5
+          ],
+          "impl": [
+            "omp-part",
+            "omp-merge"
+          ],
+          "threads": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            8
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576
+        }
+      }
     ],
     "skew": [
-      {"tool": "flowfeat", "grid": {"zipf": [0.0, 0.5, 0.8, 1.0, 1.2, 1.5, 2.0], "impl": ["seq", "gpu-flow", "gpu-atomic", "gpu-chunk"]}, "fixed": {"logn": 24, "flows": 1048576}},
-      {"tool": "flowfeat", "grid": {"zipf": [0.0, 0.5, 0.8, 1.0, 1.2, 1.5, 2.0], "impl": ["omp-part", "omp-merge"]}, "fixed": {"logn": 24, "flows": 1048576, "threads": 8}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "zipf": [
+            0.0,
+            0.5,
+            0.8,
+            1.0,
+            1.2,
+            1.5,
+            2.0
+          ],
+          "impl": [
+            "seq",
+            "gpu-flow",
+            "gpu-atomic",
+            "gpu-chunk"
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "zipf": [
+            0.0,
+            0.5,
+            0.8,
+            1.0,
+            1.2,
+            1.5,
+            2.0
+          ],
+          "impl": [
+            "omp-part",
+            "omp-merge"
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576,
+          "threads": 8
+        }
+      }
     ],
     "flows": [
-      {"tool": "flowfeat", "grid": {"flows": [256, 4096, 65536, 262144, 1048576, 4194304], "impl": ["seq", "gpu-flow", "gpu-atomic", "gpu-chunk"]}, "fixed": {"logn": 24, "zipf": 0.0}},
-      {"tool": "flowfeat", "grid": {"flows": [256, 4096, 65536, 262144, 1048576, 4194304], "impl": ["omp-part", "omp-merge"]}, "fixed": {"logn": 24, "zipf": 0.0, "threads": 8}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "flows": [
+            256,
+            4096,
+            65536,
+            262144,
+            1048576,
+            4194304
+          ],
+          "impl": [
+            "seq",
+            "gpu-flow",
+            "gpu-atomic",
+            "gpu-chunk"
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "zipf": 0.0
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "flows": [
+            256,
+            4096,
+            65536,
+            262144,
+            1048576,
+            4194304
+          ],
+          "impl": [
+            "omp-part",
+            "omp-merge"
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "zipf": 0.0,
+          "threads": 8
+        }
+      }
     ],
     "weak": [
-      {"tool": "flowfeat", "zip": {"n": [4194304, 8388608, 16777216, 33554432], "flows": [262144, 524288, 1048576, 2097152]}, "fixed": {"zipf": 1.0, "impl": "seq"}},
-      {"tool": "flowfeat", "zip": {"threads": [1, 2, 4, 8], "n": [4194304, 8388608, 16777216, 33554432], "flows": [262144, 524288, 1048576, 2097152]}, "fixed": {"zipf": 1.0, "impl": "omp-part"}},
-      {"tool": "flowfeat", "zip": {"threads": [1, 2, 4, 8], "n": [4194304, 8388608, 16777216, 33554432], "flows": [262144, 524288, 1048576, 2097152]}, "fixed": {"zipf": 1.0, "impl": "omp-merge"}}
+      {
+        "tool": "flowfeat",
+        "zip": {
+          "n": [
+            4194304,
+            8388608,
+            16777216,
+            33554432
+          ],
+          "flows": [
+            262144,
+            524288,
+            1048576,
+            2097152
+          ]
+        },
+        "fixed": {
+          "zipf": 1.0,
+          "impl": "seq"
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "zip": {
+          "threads": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "n": [
+            4194304,
+            8388608,
+            16777216,
+            33554432
+          ],
+          "flows": [
+            262144,
+            524288,
+            1048576,
+            2097152
+          ]
+        },
+        "fixed": {
+          "zipf": 1.0,
+          "impl": "omp-part"
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "zip": {
+          "threads": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "n": [
+            4194304,
+            8388608,
+            16777216,
+            33554432
+          ],
+          "flows": [
+            262144,
+            524288,
+            1048576,
+            2097152
+          ]
+        },
+        "fixed": {
+          "zipf": 1.0,
+          "impl": "omp-merge"
+        }
+      }
     ],
     "gpu_tpb": [
-      {"tool": "flowfeat", "grid": {"tpb": [32, 64, 128, 256, 512, 1024], "impl": ["gpu-flow", "gpu-atomic", "gpu-chunk"]}, "fixed": {"logn": 24, "flows": 1048576, "zipf": 1.0}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "tpb": [
+            32,
+            64,
+            128,
+            256,
+            512,
+            1024
+          ],
+          "impl": [
+            "gpu-flow",
+            "gpu-atomic",
+            "gpu-chunk"
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576,
+          "zipf": 1.0
+        }
+      }
     ],
     "gpu_chunk": [
-      {"tool": "flowfeat", "grid": {"zipf": [0.0, 1.0, 1.5], "chunk": [1, 2, 4, 8, 16, 32, 64, 128, 255]}, "fixed": {"logn": 24, "flows": 1048576, "impl": "gpu-chunk"}},
-      {"tool": "flowfeat", "grid": {"chunk": [1, 2, 4, 8, 16, 32, 64, 128, 255]}, "fixed": {"input": "mawi_60s.pkt", "impl": "gpu-chunk"}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "zipf": [
+            0.0,
+            1.0,
+            1.5
+          ],
+          "chunk": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64,
+            128,
+            255
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576,
+          "impl": "gpu-chunk"
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "chunk": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32,
+            64,
+            128,
+            255
+          ]
+        },
+        "fixed": {
+          "input": "mawi_60s.pkt",
+          "impl": "gpu-chunk"
+        }
+      }
     ],
     "transfer": [
-      {"tool": "flowfeat", "grid": {"pageable": [false, true], "pinned-out": [false, true]}, "fixed": {"logn": 24, "flows": 1048576, "zipf": 1.0, "impl": "gpu-chunk"}},
-      {"tool": "flowfeat", "grid": {"pageable": [false, true], "pinned-out": [false, true]}, "fixed": {"input": "mawi_60s.pkt", "impl": "gpu-chunk"}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "pageable": [
+            false,
+            true
+          ],
+          "pinned-out": [
+            false,
+            true
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 1048576,
+          "zipf": 1.0,
+          "impl": "gpu-chunk"
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "pageable": [
+            false,
+            true
+          ],
+          "pinned-out": [
+            false,
+            true
+          ]
+        },
+        "fixed": {
+          "input": "mawi_60s.pkt",
+          "impl": "gpu-chunk"
+        }
+      }
     ],
     "contention": [
-      {"tool": "contention", "grid": {"zipf": [0.0, 0.5, 1.0, 1.2, 1.5, 2.0], "threads": [1, 2, 4, 8]}, "fixed": {"logn": 24, "flows": 262144}, "reps": 5}
+      {
+        "tool": "contention",
+        "grid": {
+          "zipf": [
+            0.0,
+            0.5,
+            1.0,
+            1.2,
+            1.5,
+            2.0
+          ],
+          "threads": [
+            1,
+            2,
+            4,
+            8
+          ]
+        },
+        "fixed": {
+          "logn": 24,
+          "flows": 262144
+        },
+        "reps": 5
+      }
     ],
     "real": [
-      {"tool": "flowfeat", "grid": {"input": ["mawi_60s.pkt", "mawi_120s.pkt", "mawi_240s.pkt"], "impl": ["seq", "gpu-atomic", "gpu-chunk"]}},
-      {"tool": "flowfeat", "grid": {"input": ["mawi_60s.pkt", "mawi_120s.pkt"], "impl": ["gpu-flow"]}},
-      {"tool": "flowfeat", "grid": {"input": ["mawi_60s.pkt", "mawi_120s.pkt", "mawi_240s.pkt"], "impl": ["omp-part", "omp-merge"]}, "fixed": {"threads": 8}},
-      {"tool": "flowfeat", "grid": {"impl": ["omp-part", "omp-merge"], "threads": [1, 2, 4]}, "fixed": {"input": "mawi_60s.pkt"}}
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "input": [
+            "mawi_60s.pkt",
+            "mawi_120s.pkt",
+            "mawi_240s.pkt"
+          ],
+          "impl": [
+            "seq",
+            "gpu-atomic",
+            "gpu-chunk"
+          ]
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "input": [
+            "mawi_60s.pkt",
+            "mawi_120s.pkt",
+            "mawi_240s.pkt"
+          ],
+          "impl": [
+            "gpu-flow"
+          ]
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "input": [
+            "mawi_60s.pkt",
+            "mawi_120s.pkt",
+            "mawi_240s.pkt"
+          ],
+          "impl": [
+            "omp-part",
+            "omp-merge"
+          ]
+        },
+        "fixed": {
+          "threads": 8
+        }
+      },
+      {
+        "tool": "flowfeat",
+        "grid": {
+          "impl": [
+            "omp-part",
+            "omp-merge"
+          ],
+          "threads": [
+            1,
+            2,
+            4
+          ]
+        },
+        "fixed": {
+          "input": "mawi_60s.pkt"
+        }
+      }
     ],
     "mpi_strong": [
-      {"tool": "mpi", "grid": {"schedule": ["static", "dynamic"], "procs": [1, 2, 4, 8]}, "fixed": {"batches": "w30/*.pkt", "count": 30, "impl": "seq"}, "reps": 5}
+      {
+        "tool": "mpi",
+        "grid": {
+          "schedule": [
+            "static",
+            "dynamic"
+          ],
+          "procs": [
+            1,
+            2,
+            4,
+            8
+          ]
+        },
+        "fixed": {
+          "batches": "w30/*.pkt",
+          "count": 30,
+          "impl": "seq"
+        },
+        "reps": 5
+      }
     ],
     "mpi_weak": [
-      {"tool": "mpi", "zip": {"procs": [1, 2, 4, 8], "count": [3, 6, 12, 24]}, "fixed": {"batches": "w30/*.pkt", "impl": "seq", "schedule": "static"}, "reps": 5}
+      {
+        "tool": "mpi",
+        "zip": {
+          "procs": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "count": [
+            3,
+            6,
+            12,
+            24
+          ]
+        },
+        "fixed": {
+          "batches": "w30/*.pkt",
+          "impl": "seq",
+          "schedule": "static"
+        },
+        "reps": 5
+      }
     ],
     "mpi_collect": [
-      {"tool": "mpi", "grid": {"collect": ["summary", "features"], "procs": [1, 2, 4, 8]}, "fixed": {"batches": "w30/*.pkt", "count": 8, "impl": "seq", "schedule": "static"}, "reps": 5}
+      {
+        "tool": "mpi",
+        "grid": {
+          "collect": [
+            "summary",
+            "features"
+          ],
+          "procs": [
+            1,
+            2,
+            4,
+            8
+          ]
+        },
+        "fixed": {
+          "batches": "w30/*.pkt",
+          "count": 8,
+          "impl": "seq",
+          "schedule": "static"
+        },
+        "reps": 5
+      }
     ],
     "mpi_hybrid": [
-      {"tool": "mpi", "zip": {"procs": [1, 2, 4, 8], "threads": [8, 4, 2, 1]}, "fixed": {"batches": "w30/*.pkt", "count": 30, "impl": "omp-part", "schedule": "dynamic"}, "reps": 5}
+      {
+        "tool": "mpi",
+        "zip": {
+          "procs": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "threads": [
+            8,
+            4,
+            2,
+            1
+          ]
+        },
+        "fixed": {
+          "batches": "w30/*.pkt",
+          "count": 30,
+          "impl": "omp-part",
+          "schedule": "dynamic"
+        },
+        "reps": 5
+      }
     ],
     "mpi_uneven": [
-      {"tool": "mpi", "grid": {"schedule": ["static", "dynamic"], "procs": [1, 2, 4, 8]}, "fixed": {"batches": "uneven/*.pkt", "count": 16, "impl": "seq"}, "reps": 5}
+      {
+        "tool": "mpi",
+        "grid": {
+          "schedule": [
+            "static",
+            "dynamic"
+          ],
+          "procs": [
+            1,
+            2,
+            4,
+            8
+          ]
+        },
+        "fixed": {
+          "batches": "uneven/*.pkt",
+          "count": 16,
+          "impl": "seq"
+        },
+        "reps": 5
+      }
     ]
   }
 }

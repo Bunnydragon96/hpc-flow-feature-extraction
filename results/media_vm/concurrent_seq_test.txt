@@ -1,0 +1,9 @@
+ 10:54:31 up 1 day, 14:28,  1 user,  load average: 0.30, 0.38, 0.31
+--input ../data/w30/mawi_0000.pkt | 1 concurrent: mean 0.504 s per process
+--input ../data/w30/mawi_0000.pkt | 2 concurrent: mean 0.570 s per process
+--input ../data/w30/mawi_0000.pkt | 4 concurrent: mean 0.809 s per process
+--input ../data/w30/mawi_0000.pkt | 8 concurrent: mean 1.527 s per process
+--logn 23 --flows 4096 --zipf 0 | 1 concurrent: mean 0.226 s per process
+--logn 23 --flows 4096 --zipf 0 | 2 concurrent: mean 0.288 s per process
+--logn 23 --flows 4096 --zipf 0 | 4 concurrent: mean 0.237 s per process
+--logn 23 --flows 4096 --zipf 0 | 8 concurrent: mean 0.563 s per process

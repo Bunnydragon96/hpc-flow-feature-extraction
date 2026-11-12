@@ -63,7 +63,7 @@ versions use the same table and the same update function.
 A first idea is one shared table protected by locks or atomic instructions. It
 cannot compute the order-dependent features, because threads would update a
 flow out of order, and it contends on popular flows. We measure that contention
-separately (Section~\ref{sec:contention}) and use two other strategies, shown in
+separately (Section~III-\ref{sec:contention}) and use two other strategies, shown in
 Fig.~\ref{fig:pipeline}.
 
 \emph{Merge} (\code{omp-merge}). The packets are split into $T$ contiguous

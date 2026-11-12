@@ -41,7 +41,7 @@ in any order; it has to keep or rebuild the time order of each flow.
 Grouping and aggregation is a classic database operation. On multicore
 processors the two main families are a shared hash table and partitioning the
 input so that each thread owns a disjoint part of the
-keys~\cite{balkesen,cieslewicz}. On a Graphics Processing Unit (GPU), grouping
+keys~\cite{cieslewicz,balkesen}. On a Graphics Processing Unit (GPU), grouping
 is usually built from data-parallel primitives: lock-free hash tables filled
 with compare-and-swap instructions~\cite{alcantara}, radix sort, prefix sums
 and segmented reductions, available for example in the Thrust
