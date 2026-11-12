@@ -1,0 +1,82 @@
+% Final report, CIIC 5019. Layout follows "Final Report Guidelines.docx":
+% letter paper, 0.75 in side margins, 1 in top and bottom, two columns, Times 10 pt,
+% sections Introduction / Methods / Results / Conclusions / References.
+% Compile with: tectonic report.tex
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage[left=0.75in,right=0.75in,top=1in,bottom=1in,columnsep=0.25in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+\captionsetup{font=footnotesize, labelsep=colon, skip=4pt}
+\captionsetup[table]{position=top}
+\setlist{itemsep=1pt, topsep=2pt, leftmargin=1.2em}
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{1em}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+
+% Headings as in the template: small capitals with Roman numerals, italic subheadings.
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\Alph{subsection}}
+\titleformat{\section}{\normalfont\normalsize\scshape}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\normalsize\itshape}{\thesubsection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{8pt plus 2pt}{4pt}
+\titlespacing*{\subsection}{0pt}{6pt plus 2pt}{3pt}
+
+\definecolor{ink}{HTML}{0B0B0B}
+\definecolor{ink2}{HTML}{52514E}
+\definecolor{b1}{HTML}{CDE2FB}
+\definecolor{b2}{HTML}{9EC5F4}
+\definecolor{o1}{HTML}{FBDCCF}
+\definecolor{g1}{HTML}{CFEFE3}
+\definecolor{y1}{HTML}{FBEAC2}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\x}{$\times$}
+\makeatletter\newcommand{\tabinput}[1]{\@@input #1 }\makeatother
+\input{tables/numbers.tex}
+
+\begin{document}
+
+\twocolumn[
+\begin{center}
+{\fontsize{14}{17}\selectfont\bfseries GPU-ACCELERATED NETWORK FLOW FEATURE EXTRACTION\par}
+\vspace{14pt}
+{\fontsize{11}{13}\selectfont Johnel Cunningham Rivera\par}
+\vspace{2pt}
+{\normalsize Computer Science and Engineering Department\\
+University of Puerto Rico\\
+Mayaguez, Puerto Rico, USA\par}
+\vspace{14pt}
+\end{center}
+]
+
+\input{sec_abstract}
+\input{sec_intro}
+\input{sec_methods}
+\input{sec_results}
+\input{sec_conclusions}
+\input{sec_references}
+
+\end{document}

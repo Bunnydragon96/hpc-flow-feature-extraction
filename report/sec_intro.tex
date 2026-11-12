@@ -1,0 +1,71 @@
+\section{Introduction}
+
+\subsection{Problem}
+Network monitoring and intrusion detection rarely work on single packets. They
+work on \emph{flows}: all the packets that share the same source address,
+destination address, source port, destination port and protocol. A flow is
+summarized by a record of features such as its packet and byte counts, the
+statistics of its packet sizes and inter-arrival times, the Transmission Control
+Protocol (TCP) flags it carried, and how bursty it was. Flow records are the
+input of flow exporters such as NetFlow~\cite{netflow}, of feature extractors
+such as CICFlowMeter~\cite{cicflowmeter}, and of the machine-learning detectors
+trained on data sets such as CIC-IDS2017~\cite{cicids}.
+
+The problem we solve is the step from packets to flow records. Given a batch of
+captured packets in time order, we must group the packets by flow and compute
+the features of every flow. A backbone link carries hundreds of thousands of
+packets per second, so a capture of a few minutes already holds tens of
+millions of packets and millions of flows.
+
+\subsection{Why it is important and why it is hard}
+Feature extraction is the first stage of every flow-based detector, and it
+must keep up with the traffic. If it is slow, the detector sees the traffic
+late or sees only a sample of it. The computation is simple per packet, but
+three properties make it expensive and hard to parallelize.
+
+\emph{Irregular memory access.} Every packet updates the record of its flow,
+and consecutive packets belong to unrelated flows. With millions of flows the
+records do not fit in the processor caches, so most updates are cache misses.
+
+\emph{Skew.} Traffic is heavy-tailed: a few ``elephant'' flows carry a large
+share of the packets while most flows are ``mice'' with one or two
+packets~\cite{elephants}. When many packets belong to the same flow, threads
+that update one shared table contend for the same record~\cite{cieslewicz}, and
+schemes that give each flow to one worker become unbalanced.
+
+\emph{Order dependence.} Inter-arrival times and bursts depend on the order of
+the packets inside a flow. A parallel method cannot simply add contributions
+in any order; it has to keep or rebuild the time order of each flow.
+
+\subsection{Background}
+Grouping and aggregation is a classic database operation. On multicore
+processors the two main families are a shared hash table and partitioning the
+input so that each thread owns a disjoint part of the
+keys~\cite{balkesen,cieslewicz}. On a Graphics Processing Unit (GPU), grouping
+is usually built from data-parallel primitives: lock-free hash tables filled
+with compare-and-swap instructions~\cite{alcantara}, radix sort, prefix sums
+and segmented reductions, available for example in the Thrust
+library~\cite{thrust}. We use three programming models from the course:
+OpenMP~\cite{openmp} for shared-memory threads, the Compute Unified Device
+Architecture (CUDA)~\cite{cuda} for the GPU, and the Message Passing Interface
+(MPI) through its Python binding MPI4Py~\cite{mpi4py} for distributing batches
+of packet capture (PCAP) files among processes.
+
+\subsection{Contributions}
+\begin{itemize}
+\item A packet-to-flow pipeline that computes \nfeat{} features per flow,
+including order-dependent ones, with a sequential baseline, two OpenMP
+strategies, a CUDA pipeline with three reduction kernels, and an MPI4Py
+driver for batches of capture files.
+\item A formulation of the per-flow record as an associative merge, which lets
+threads process time-contiguous chunks independently and still obtain exact
+inter-arrival and burst features.
+\item An exactness guarantee: every parallel version returns the same integer
+accumulators as the baseline on every input tested (\nchecks{} automated
+checks), and derived features equal to within floating-point rounding.
+\item An experimental study on synthetic traffic with controlled skew and on a
+real backbone trace, covering runtime, speedup, efficiency, strong and weak
+scaling, GPU launch configurations, transfer cost, contention and
+communication overhead. The main finding is that no single strategy wins:
+the best choice depends on the number of flows and on the skew.
+\end{itemize}

@@ -1,0 +1,20 @@
+{
+  "description": "CPU-only experiments for the Apple M4 (4 performance + 6 efficiency cores).",
+  "reps": 7,
+  "warmup": 2,
+  "mpirun": ["mpirun"],
+  "batch_sets": {},
+  "parts": {
+    "threads": [
+      {"tool": "flowfeat", "grid": {"zipf": [0.0, 1.0, 1.5], "impl": ["seq"]}, "fixed": {"logn": 24, "flows": 1048576}},
+      {"tool": "flowfeat", "grid": {"zipf": [0.0, 1.0, 1.5], "impl": ["omp-part", "omp-merge"], "threads": [1, 2, 4, 6, 8, 10]}, "fixed": {"logn": 24, "flows": 1048576}}
+    ],
+    "real": [
+      {"tool": "flowfeat", "grid": {"impl": ["seq"]}, "fixed": {"input": "mawi_60s.pkt"}},
+      {"tool": "flowfeat", "grid": {"impl": ["omp-part", "omp-merge"], "threads": [1, 2, 4, 6, 8, 10]}, "fixed": {"input": "mawi_60s.pkt"}}
+    ],
+    "contention": [
+      {"tool": "contention", "grid": {"zipf": [0.0, 1.0, 1.5], "threads": [1, 2, 4, 8]}, "fixed": {"logn": 24, "flows": 262144}, "reps": 5}
+    ]
+  }
+}

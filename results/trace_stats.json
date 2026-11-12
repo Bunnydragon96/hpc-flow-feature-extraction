@@ -1,0 +1,19 @@
+{
+  "mawi_60s.pkt": {
+    "packets": 7708578,
+    "flows": 3180337,
+    "single_packet_flows": 3022665,
+    "flows_up_to_3_packets": 3091435,
+    "largest_flow_packets": 137064,
+    "flows_for_half_of_packets": 4515,
+    "top_1_percent_flows_packet_share": 0.5479188249765391,
+    "mean_packets_per_flow": 2.4238242676798087,
+    "bytes": 5984331833,
+    "protocol_packets": {
+      "1": 2198552,
+      "6": 3808848,
+      "17": 1291247,
+      "47": 264639
+    }
+  }
+}

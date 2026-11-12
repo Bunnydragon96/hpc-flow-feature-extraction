@@ -1,0 +1,2 @@
+2026-11-12T04:25:55+00:00 services stopped: jellyfin=inactive ersatztv=exited
+2026-11-12T04:28:00+00:00 verify exit code 0

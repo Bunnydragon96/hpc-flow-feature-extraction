@@ -1,0 +1,20 @@
+{
+  "hostname": "media-vm",
+  "system": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "date_utc": "2026-11-12 04:28:00",
+  "cpu": "Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz",
+  "logical_cpus": "8",
+  "lscpu": "Model name:                              Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz\nThread(s) per core:                      1\nCore(s) per socket:                      8\nSocket(s):                               1\nVirtualization:                          VT-x\nL1d cache:                               256 KiB (8 instances)\nL2 cache:                                32 MiB (8 instances)\nL3 cache:                                16 MiB (1 instance)",
+  "memory": "19Gi",
+  "os": "Ubuntu 24.04.5 LTS",
+  "kernel": "6.8.0-147-generic",
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "gpu": "Quadro P2000, 580.178.04, 5120 MiB",
+  "nvcc": "Cuda compilation tools, release 12.0, V12.0.140",
+  "thp": "always [madvise] never",
+  "mpi": "mpirun (Open MPI) 4.1.6",
+  "mpi4py": "4.1.2",
+  "numpy": "2.5.4",
+  "loadavg_at_start": "04:28:00 up 1 day,  8:02,  1 user,  load average: 2.05, 1.71, 1.60"
+}

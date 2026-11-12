@@ -1,0 +1,185 @@
+\section{Methods}
+
+\subsection{Flow records and features}
+A packet is stored in 20 bytes: a timestamp in microseconds relative to the
+start of its batch, the two addresses of Internet Protocol version 4 (IPv4),
+the two ports, the protocol, the TCP flags and the packet length. A flow is
+unidirectional and is identified by the five key fields. A batch is a time
+window of a capture; flows are defined inside a batch, as flow exporters do
+with their timeouts~\cite{netflow}.
+
+For every flow we keep a 176-byte record of \emph{exact integer accumulators}
+and derive the \nfeat{} features of Table~\ref{tab:features} from it. A burst
+is a maximal run of packets of the flow whose gaps are shorter than
+1\,ms. The standard deviations are computed from integer sums with a 128-bit
+numerator, with the same code on the processor and on the GPU. This design
+makes results comparable bit by bit instead of ``close enough''.
+
+\begin{table}[H]
+\centering\footnotesize
+\caption{Features computed for every flow. The last column tells whether the
+feature depends on the order of the packets inside the flow.}\label{tab:features}
+\begin{tabular}{@{}p{0.23\linewidth}p{0.55\linewidth}c@{}}
+\toprule
+Group & Features & Order \\
+\midrule
+Volume & packets, bytes, packet rate, byte rate & no \\
+Time & first and last timestamp, duration & no \\
+Packet length & minimum, maximum, mean, standard deviation & no \\
+Flags & packets with FIN, SYN, RST, PSH, ACK, URG & no \\
+Entropy & Shannon entropy of the length histogram (16 bins of 100 bytes) & no \\
+Inter-arrival time & minimum, maximum, mean, standard deviation & yes \\
+Bursts & number of bursts, longest burst, mean burst size & yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Data sources}
+\emph{Synthetic traffic.} A generator produces $n$ packets over $F$ flows. The
+flow of each packet is drawn from a Zipf distribution: the flow of popularity
+rank $r$ is chosen with probability proportional to $r^{-s}$. The exponent $s$
+controls the skew: $s=0$ is uniform, and at $s=1.5$ one flow receives
+\topshareHi\% of all packets. Arrivals form a Poisson process of 500{,}000
+packets per second. The generator is counter-based, so a seed always gives the
+same packets.
+
+\emph{Real traffic.} We use a public 15-minute trace of a transit link of the
+WIDE backbone in Japan, from the MAWI archive~\cite{mawi} (sample point F,
+January 1, 2024, 14:00). It has 129.1 million packets, of which 114.4 million
+are IPv4. A converter (\code{pcap2pkt}) parses the capture file and writes
+batches. One minute of this trace has \realN{} million packets in \realF{}
+million flows: \realSingle\% of the flows have a single packet, while the
+largest flow has \realTop\% of the packets. Real traffic therefore combines
+both difficulties: very many flows and elephants.
+
+\subsection{Sequential baseline}
+The baseline reads the packets in time order. For each packet it looks up the
+flow in an open-addressing hash table with linear probing and updates the
+record in place, including the last timestamp and the length of the current
+burst. This is the reference for correctness and for speedup. All processor
+versions use the same table and the same update function.
+
+\subsection{OpenMP strategies}
+A first idea is one shared table protected by locks or atomic instructions. It
+cannot compute the order-dependent features, because threads would update a
+flow out of order, and it contends on popular flows. We measure that contention
+separately (Section~\ref{sec:contention}) and use two other strategies, shown in
+Fig.~\ref{fig:pipeline}.
+
+\emph{Merge} (\code{omp-merge}). The packets are split into $T$ contiguous
+chunks, one per thread. Each thread aggregates its chunk into a private table.
+The partial records of a flow are then combined in chunk order with a merge
+operation. To make the merge exact for order-dependent features, a partial
+record also stores the lengths of its first and last burst. When two partial
+records are merged, the gap between the last packet of the first and the first
+packet of the second gives one more inter-arrival time, and decides whether
+the two boundary bursts join. The operation is associative, so it is a correct
+parallel reduction. The merge itself runs in parallel: the hash space is cut
+into ranges and each range is merged by one thread.
+
+\emph{Partition} (\code{omp-part}). The packets are first scattered into
+1{,}024 partitions by the top bits of the flow hash, with a parallel counting
+sort that keeps the time order. All packets of a flow land in the same
+partition. Each partition is then aggregated by one thread with a private
+table, under a dynamic schedule with the largest partitions first. Nothing is
+shared and nothing is merged, and a partition fits in the cache. Its weakness
+is that one flow cannot be split among threads.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[font=\footnotesize, >=Stealth,
+  box/.style={draw=ink2, rounded corners=2pt, minimum height=6.5mm, inner xsep=4pt, align=center},
+  lab/.style={font=\footnotesize\itshape, text=ink2, anchor=east}]
+% row 1: merge
+\node[lab] at (-0.2,2.4) {OpenMP merge};
+\node[box, fill=b1] (m1) at (1.6,2.4) {$T$ time chunks};
+\node[box, fill=b1, right=7mm of m1] (m2) {private table\\per thread};
+\node[box, fill=b1, right=7mm of m2] (m3) {merge partial records\\by hash range};
+\node[box, fill=y1, right=7mm of m3] (m4) {derive\\features};
+\draw[->] (m1)--(m2); \draw[->] (m2)--(m3); \draw[->] (m3)--(m4);
+% row 2: partition
+\node[lab] at (-0.2,1.2) {OpenMP partition};
+\node[box, fill=o1] (p1) at (1.6,1.2) {hash packets};
+\node[box, fill=o1, right=7mm of p1] (p2) {scatter into\\1{,}024 partitions};
+\node[box, fill=o1, right=7mm of p2] (p3) {private table\\per partition};
+\node[box, fill=y1, right=7mm of p3] (p4) {derive\\features};
+\draw[->] (p1)--(p2); \draw[->] (p2)--(p3); \draw[->] (p3)--(p4);
+% row 3: GPU
+\node[lab] at (-0.2,0) {CUDA};
+\node[box, fill=g1] (g0) at (1.25,0) {upload};
+\node[box, fill=g1, right=4mm of g0] (g1) {flow id:\\lock-free table};
+\node[box, fill=g1, right=4mm of g1] (g2) {stable sort\\by flow id};
+\node[box, fill=g1, right=4mm of g2] (g3) {gather,\\prefix sum};
+\node[box, fill=g1, right=4mm of g3] (g4) {reduce: flow /\\atomic / chunk};
+\node[box, fill=y1, right=4mm of g4] (g5) {derive\\features};
+\node[box, fill=g1, right=4mm of g5] (g6) {download};
+\draw[->] (g0)--(g1); \draw[->] (g1)--(g2); \draw[->] (g2)--(g3); \draw[->] (g3)--(g4); \draw[->] (g4)--(g5); \draw[->] (g5)--(g6);
+\end{tikzpicture}
+\caption{The three parallel pipelines. Every row starts from the same
+time-ordered packet batch and ends with the same flow records.}
+\label{fig:pipeline}
+\end{figure*}
+
+\subsection{CUDA pipeline}
+The GPU version (Fig.~\ref{fig:pipeline}) does not update a table packet by
+packet. It regroups the packets so that every feature becomes a reduction over
+a contiguous segment.
+
+\emph{1. Flow identifier.} One thread per packet inserts the key in a
+lock-free open-addressing table~\cite{alcantara}. A slot is a single 32-bit
+word that stores the index of the packet that claimed it, so one
+compare-and-swap inserts a 13-byte key, and keys are compared through that
+packet. The slot index identifies the flow exactly; no hash collisions are
+tolerated.
+
+\emph{2. Sort.} A stable radix sort from Thrust~\cite{thrust} orders the packet
+indices by flow identifier. The packets of a flow become contiguous and remain
+in time order.
+
+\emph{3. Gather.} Timestamps and lengths are copied into sorted order, so the
+following kernels read memory sequentially (coalesced access). A prefix sum
+over the flow boundaries numbers the flows.
+
+\emph{4. Reduce.} After sorting, the inter-arrival time of a packet is the
+difference with its left neighbor, so every feature is a sum, minimum or
+maximum over a segment. We implemented three kernels. \code{gpu-flow} uses one
+thread per flow, which walks the packets of its flow. \code{gpu-atomic} uses
+one thread per packet, which adds its contribution to the record of its flow
+with atomic instructions. \code{gpu-chunk} uses one thread per chunk of $c$
+consecutive sorted packets; it accumulates in registers while the flow does
+not change and issues one atomic update per flow met in the chunk. Burst
+lengths are obtained by compacting the positions where bursts start.
+
+\emph{5. Derive and download.} A kernel derives the statistical features, and
+records are copied back to the host.
+
+\subsection{MPI4Py distribution}
+Captures are processed as independent batches, which fits distributed
+memory: a driver written with MPI4Py gives batches to processes, and each
+process calls the C++ kernel through a shared library. With the \emph{static}
+schedule, each process takes a contiguous block of the batch list. With the
+\emph{dynamic} schedule, every process takes the next unclaimed batch from a
+shared counter that is advanced with a one-sided fetch-and-add operation,
+largest batches first. Process 0 collects either a summary per batch or all
+the flow records (\code{Gatherv}).
+
+\subsection{Correctness and quality metric}
+The application-specific quality metric is \emph{flow-record accuracy}: the
+fraction of flows whose record is identical to the reference. The reference
+chain has two links. First, the sequential baseline is compared with an
+independent implementation written in plain Python, which groups packets in
+a dictionary and computes every feature from the full packet list of the
+flow. Second, every parallel version is compared with the baseline: integer
+accumulators must be identical and derived features must agree within a
+relative tolerance of $10^{-9}$. The test suite covers edge cases (one
+packet, one flow, all flows distinct, more threads than packets, odd thread
+counts, extreme burst gaps), all GPU launch configurations, the MPI driver and
+the real trace. During the benchmarks, every run also reports a checksum of
+its records, and the driver stops if two versions disagree on the same input.
+
+\subsection{Code and data availability}
+The source code, build instructions, configuration files, raw results and the
+scripts that regenerate every figure and table are in the open repository
+\url{https://github.com/Bunnydragon96/hpc-flow-feature-extraction}. The
+synthetic data are generated by the programs. The real trace is downloaded
+from the MAWI archive~\cite{mawi} with the command given in the repository.

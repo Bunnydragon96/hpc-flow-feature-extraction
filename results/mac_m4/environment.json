@@ -1,0 +1,16 @@
+{
+  "hostname": "Johnels-Mac-mini.local",
+  "system": "macOS-27.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.15",
+  "date_utc": "2026-11-12 04:28:00",
+  "cpu": "Apple M4",
+  "performance_cores": "4",
+  "efficiency_cores": "6",
+  "memory_bytes": "17179869184",
+  "os": "macOS 27.2",
+  "compiler": "g++-16 (Homebrew GCC 16.2.0) 16.2.0",
+  "mpi": "mpirun (Open MPI) 5.0.11",
+  "mpi4py": "",
+  "numpy": "",
+  "loadavg_at_start": "0:28  up 2 days,  3:25, 1 user, load averages: 2.56 2.10 2.18"
+}

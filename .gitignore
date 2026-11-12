@@ -1,0 +1,19 @@
+# course material and local files that are not part of the project
+Final Project Description.pdf
+Final Report Guidelines.docx
+Project Proposal.md
+.venv/
+data/
+.DS_Store
+.claude/
+*.zip
+# build products
+code/build/
+code/flowfeat
+code/pcap2pkt
+code/contention_bench
+code/libflowfeat.so
+__pycache__/
+report/build/
+report/*.log
+report/*.aux
